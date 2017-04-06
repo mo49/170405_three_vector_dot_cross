@@ -30,6 +30,24 @@ export default class FlashLight extends THREE.Object3D {
     );
     this.add(head);
     head.position.y = 2;
+
+    // ビーム
+    var loader = new THREE.TextureLoader();
+    let beamTexture = loader.load('imgs/beam.png');
+    let beam = new THREE.Mesh(
+      new THREE.CylinderBufferGeometry(15, 0.5, 20, 10, 10, true),
+      new THREE.MeshBasicMaterial({
+        color: 0xFFFF55,
+        opacity: 0.5,
+        transparent: true,
+        map: beamTexture,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending
+      })
+    );
+    beam.position.y = 12;
+    this.add(beam);
   }
 
   /**
