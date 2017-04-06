@@ -27,7 +27,7 @@ export default class StepOneScene extends THREE.Scene {
     // 床
     let gridHelper = new THREE.GridHelper(30, 30);
     gridHelper.position.y = -10;
-    this.add(gridHelper);
+    //this.add(gridHelper);
 
     // 懐中電灯
     this._flashLight = new FlashLight();
@@ -37,13 +37,13 @@ export default class StepOneScene extends THREE.Scene {
     this._particleEmiiter = new ParticleEmitter();
     this.add(this._particleEmiiter);
 
-
+    // ターゲット位置確認用
     this._arrowHelper = new THREE.ArrowHelper(
       new THREE.Vector3(0, 1, 0),
       new THREE.Vector3(0, 0, 0),
       20, 0xFF0000
     );
-    this.add(this._arrowHelper);
+    //this.add(this._arrowHelper);
   }
 
   /**
@@ -57,10 +57,10 @@ export default class StepOneScene extends THREE.Scene {
     let handleRadian = this._handleAngle * Math.PI / 180;
 
     // ライトを更新
-    this._flashLight.update(handleRadian, -handleRadian);
+    this._flashLight.update(handleRadian * 2, -handleRadian * 1.5);
     this._arrowHelper.setDirection(this._flashLight.frontVector);
 
     // パーティクルを更新
-    this._particleEmiiter.update();
+    this._particleEmiiter.update(this._flashLight.frontVector);
   }
 }
