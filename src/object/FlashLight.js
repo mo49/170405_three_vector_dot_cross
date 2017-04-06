@@ -45,7 +45,7 @@ export default class FlashLight extends THREE.Object3D {
       new THREE.CylinderBufferGeometry(15, 0.5, 20, 10, 10, true),
       new THREE.MeshBasicMaterial({
         color: 0xFFFF55,
-        opacity: 0.2,
+        opacity: 0.3,
         transparent: true,
         map: beamTexture,
         depthWrite: false,
