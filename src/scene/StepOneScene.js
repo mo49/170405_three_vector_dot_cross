@@ -36,6 +36,14 @@ export default class StepOneScene extends THREE.Scene {
     // パーティクルエミッター
     this._particleEmiiter = new ParticleEmitter();
     this.add(this._particleEmiiter);
+
+
+    this._arrowHelper = new THREE.ArrowHelper(
+      new THREE.Vector3(0, 1, 0),
+      new THREE.Vector3(0, 0, 0),
+      20, 0xFF0000
+    );
+    this.add(this._arrowHelper);
   }
 
   /**
@@ -48,9 +56,11 @@ export default class StepOneScene extends THREE.Scene {
     this._handleAngle++;
     let handleRadian = this._handleAngle * Math.PI / 180;
 
-    this._flashLight.rotation.x = handleRadian;
-    this._flashLight.rotation.z = handleRadian * 0.5;
-    this._flashLight.rotation.y = handleRadian;
+    // ライトを更新
+    this._flashLight.update(handleRadian, -handleRadian);
+    this._arrowHelper.setDirection(this._flashLight.frontVector);
 
+    // パーティクルを更新
+    this._particleEmiiter.update();
   }
 }

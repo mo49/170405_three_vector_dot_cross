@@ -5,12 +5,19 @@ import * as THREE from 'three';
  */
 export default class FlashLight extends THREE.Object3D {
 
+  /** フロントベクトル */
+  get frontVector() { return this._frontVector; }
+
   /**
    * コンストラクター
    * @constructor
    */
   constructor() {
     super();
+
+    // 正面ベクトル
+    this._baseFrontVector = new THREE.Vector3(0, 1, 0);
+    this._frontVector = this._baseFrontVector.clone();
 
     // 持ち手部分
     let handle = new THREE.Mesh(
@@ -53,6 +60,14 @@ export default class FlashLight extends THREE.Object3D {
   /**
    * フレーム毎のアップデートをします。
    */
-  update() {
+  update(phi, theta) {
+    this.rotation.z = -(phi - (90 * Math.PI / 180));
+    this.rotation.y = theta;
+
+    let x = -Math.cos(phi) * Math.cos(theta);
+    let y = Math.sin(phi);
+    let z = Math.cos(phi) * Math.sin(theta);
+
+    this._frontVector = new THREE.Vector3(x, y, z);
   }
 }
