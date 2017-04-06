@@ -17,13 +17,15 @@ export default class Camera extends THREE.PerspectiveCamera {
   constructor() {
     super(45, window.innerWidth / window.innerHeight, 1, 500);
     Camera._instance = this;
+
+    this.position.y = 40;
+    this.position.z = 60;
   }
 
   /**
    * 毎フレームの更新をかけます。
    */
   update() {
-    // this.position.copy(newPosition);
-    // this.lookAt(lookAtPositon);
+    this.lookAt(new THREE.Vector3(0, 0, 0));
   }
 }
