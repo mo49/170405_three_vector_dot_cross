@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import StepOneScene from './scene/StepOneScene';
+import StepTwoScene from './scene/StepTwoScene';
 import Camera from './camera/Camera';
 import TWEEN from 'tween.js';
 
@@ -22,7 +23,7 @@ export default class App {
     console.info(this._wrapper);
 
     // シーン
-    this._scene = new StepOneScene();
+    this._scene = new StepTwoScene();
 
     // カメラ
     this._camera = Camera.instance;
