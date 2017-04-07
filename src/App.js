@@ -7,23 +7,29 @@ import TWEEN from 'tween.js';
 /**
  * メインアプリクラスです。
  */
-export default class App {
+module.exports = class App {
 
   /**
    * コンストラクター
    * @constructor
    */
-  constructor() {
+  constructor(step) {
 
     this._update = this._update.bind(this);
     this._resize = this._resize.bind(this);
 
     // DOM
     this._wrapper = document.getElementById('app');
-    console.info(this._wrapper);
 
     // シーン
-    this._scene = new StepTwoScene();
+    switch(step) {
+      case 1:
+        this._scene = new StepOneScene();
+        break;
+      case 2:
+        this._scene = new StepTwoScene();
+        break;
+    };
 
     // カメラ
     this._camera = Camera.instance;
@@ -67,8 +73,3 @@ export default class App {
     this._camera.updateProjectionMatrix();
   }
 }
-
-
-window.addEventListener('load', () => {
-  let app = new App();
-});

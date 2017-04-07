@@ -19,7 +19,7 @@ export default class Camera extends THREE.PerspectiveCamera {
     Camera._instance = this;
 
     this.position.y = 40;
-    this.position.z = 60;
+    this.position.z = 30;
   }
 
   /**

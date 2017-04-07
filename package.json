@@ -2,8 +2,8 @@
   "scripts": {
     "start": "npm run watch & npm run lite",
     "lite": "lite-server",
-    "build": "browserify src/App.js -t babelify -d -o public/js/sample.js",
-    "watch": "watchify src/App.js -t babelify -d -o public/js/sample.js",
+    "build": "browserify src/App.js --standalone App -t babelify -d -o public/js/sample.js",
+    "watch": "watchify src/App.js --standalone App -t babelify -d -o public/js/sample.js",
     "postinstall": "npm run build"
   },
   "devDependencies": {
