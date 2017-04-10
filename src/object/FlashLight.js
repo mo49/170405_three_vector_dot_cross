@@ -26,6 +26,7 @@ export default class FlashLight extends THREE.Object3D {
         color: 0xCCCCCC
       })
     );
+    handle.rotation.z = -90 * Math.PI / 180;
     this.add(handle);
 
     // 頭
@@ -35,8 +36,9 @@ export default class FlashLight extends THREE.Object3D {
         color: 0xAAAAAA
       })
     );
+    head.rotation.z = -90 * Math.PI / 180;
+    head.position.x = 2;
     this.add(head);
-    head.position.y = 2;
 
     // ビーム
     let loader = new THREE.TextureLoader();
@@ -53,7 +55,8 @@ export default class FlashLight extends THREE.Object3D {
         blending: THREE.AdditiveBlending
       })
     );
-    beam.position.y = 12;
+    beam.rotation.z = -90 * Math.PI / 180;
+    beam.position.x = 12;
     this.add(beam);
   }
 
@@ -61,11 +64,12 @@ export default class FlashLight extends THREE.Object3D {
    * フレーム毎のアップデートをします。
    */
   update(radian) {
-    this.rotation.z = radian - (90 * Math.PI / 180);
+    // ライトを回転
+    this.rotation.z = radian;
 
+    // 正面ベクトルを更新
     let x = Math.cos(radian);
     let y = Math.sin(radian);
-
     this._frontVector = new THREE.Vector3(x, y, 0);
   }
 }
