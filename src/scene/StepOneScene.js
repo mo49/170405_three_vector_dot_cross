@@ -19,6 +19,9 @@ export default class StepOneScene extends THREE.Scene {
 
     // カメラ
     this._camera = Camera.instance;
+    this._camera.position.x = 10;
+    this._camera.position.y = 50;
+    this._camera.position.z = 10;
 
     // 環境光源
     let ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
