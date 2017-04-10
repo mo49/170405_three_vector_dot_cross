@@ -8,14 +8,19 @@ import ParticleEmitter from '../object/ParticleEmitter';
  */
 export default class StepOneScene extends THREE.Scene {
 
+  /** カメラ */
+  _camera;
+  /** 懐中電灯 */
+  _flashLight;
+  /** パーティクルエミッター */
+  _particleEmiiter;
+
   /**
    * コンストラクター
    * @constructor
    */
   constructor() {
     super();
-
-    this._handleAngle = 0;
 
     // カメラ
     this._camera = Camera.instance;
@@ -40,16 +45,16 @@ export default class StepOneScene extends THREE.Scene {
    * 更新します。
    */
   update() {
+    // カメラを更新
     this._camera.update();
 
-    // 角度をインクリメント
-    this._handleAngle += 2.5;
-    let handleRadian = this._handleAngle * Math.PI / 180;
-
     // ライトを更新
-    this._flashLight.update(handleRadian);
+    this._flashLight.update();
 
     // パーティクルを更新
-    this._particleEmiiter.update(this._flashLight.frontVector, this._flashLight.aperture);
+    this._particleEmiiter.update(
+      this._flashLight.frontVector,
+      this._flashLight.aperture
+    );
   }
 }
