@@ -60,14 +60,12 @@ export default class FlashLight extends THREE.Object3D {
   /**
    * フレーム毎のアップデートをします。
    */
-  update(phi, theta) {
-    this.rotation.z = -(phi - (90 * Math.PI / 180));
-    this.rotation.y = theta;
+  update(radian) {
+    this.rotation.z = radian - (90 * Math.PI / 180);
 
-    let x = -Math.cos(phi) * Math.cos(theta);
-    let y = Math.sin(phi);
-    let z = Math.cos(phi) * Math.sin(theta);
+    let x = Math.cos(radian);
+    let y = Math.sin(radian);
 
-    this._frontVector = new THREE.Vector3(x, y, z);
+    this._frontVector = new THREE.Vector3(x, y, 0);
   }
 }

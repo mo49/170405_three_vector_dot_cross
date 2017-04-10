@@ -53,11 +53,11 @@ export default class StepOneScene extends THREE.Scene {
     this._camera.update();
 
     // 角度をインクリメント
-    this._handleAngle++;
+    this._handleAngle += 2.5;
     let handleRadian = this._handleAngle * Math.PI / 180;
 
     // ライトを更新
-    this._flashLight.update(handleRadian * 2, -handleRadian * 1.5);
+    this._flashLight.update(handleRadian);
     this._arrowHelper.setDirection(this._flashLight.frontVector);
 
     // パーティクルを更新
