@@ -46,7 +46,8 @@ export default class ParticleEmitter extends THREE.Object3D {
    * 粒を生成します。
    */
   _createParticle() {
-    let rand = Math.floor(Math.random() * 3)
+    // ランダムに色を設定
+    let rand = Math.floor(Math.random() * 3);
     let color = ParticleEmitter.COLOR_LIST[rand];
 
     // マテリアル
@@ -61,7 +62,7 @@ export default class ParticleEmitter extends THREE.Object3D {
     // スプライト
     var sprite = new THREE.Sprite(material);
 
-    // 半径10の球の表面にランダムに配置
+    // 球の表面にランダムに配置
     let phi = Math.random() * 180;
     let theta = Math.random() * 180;
     let radius = ParticleEmitter.RADIUS;
@@ -82,9 +83,12 @@ export default class ParticleEmitter extends THREE.Object3D {
     let target = lightFrontVector.clone();
     // 全てのパーティクルに対して照らされているか判定
     _.each(this._particleStore, (particle) => {
+      // 絞り値から透明度の割合を算出
       let dot = particle.position.clone().normalize().dot(target);
       let opacity = (dot - (1 - aperture)) / aperture;
-      opacity *= Math.random(); // ちらつかせる
+      // ちらつかせます
+      opacity *= Math.random();
+      // 透明度を設定
       particle.material.opacity = opacity;
     });
   }
