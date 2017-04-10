@@ -47,6 +47,6 @@ export default class StepOneScene extends THREE.Scene {
     this._flashLight.update(handleRadian);
 
     // パーティクルを更新
-    this._particleEmiiter.update(this._flashLight.frontVector);
+    this._particleEmiiter.update(this._flashLight.frontVector, this._flashLight.aperture);
   }
 }

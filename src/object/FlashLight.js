@@ -5,8 +5,13 @@ import * as THREE from 'three';
  */
 export default class FlashLight extends THREE.Object3D {
 
-  /** フロントベクトル */
+  /** 正面ベクトル */
+  _frontVector = new THREE.Vector3(0, 1, 0);
   get frontVector() { return this._frontVector; }
+
+  /** 絞り値 */
+  _aperture = 0.2;
+  get aperture() { return this._aperture; }
 
   /**
    * コンストラクター
@@ -14,10 +19,6 @@ export default class FlashLight extends THREE.Object3D {
    */
   constructor() {
     super();
-
-    // 正面ベクトル
-    this._baseFrontVector = new THREE.Vector3(0, 1, 0);
-    this._frontVector = this._baseFrontVector.clone();
 
     // 持ち手部分
     let handle = new THREE.Mesh(

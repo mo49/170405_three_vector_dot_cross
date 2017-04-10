@@ -6,6 +6,22 @@ import {_} from 'lodash';
  */
 export default class ParticleEmitter extends THREE.Object3D {
 
+  /** パーティクルの数 */
+  static PARTICLE_NUM = 3000;
+  /** カラーリスト */
+  static COLOR_LIST = [
+    0xffff00,
+    0xffffdd,
+    0xffffff
+  ];
+  /** 球の半径 */
+  static RADIUS = 50;
+
+  /** パーティクルの入れ物 */
+  _particleStore = [];
+  /** テクスチャー */
+  _texture = null;
+
   /**
    * コンストラクター
    * @constructor
@@ -13,21 +29,15 @@ export default class ParticleEmitter extends THREE.Object3D {
   constructor() {
     super();
 
-    // パーティクルの入れ物
-    this._particleStore = [];
     // テクスチャ
     var loader = new THREE.TextureLoader();
     this._texture = loader.load('imgs/particle.png');
-    /** カラー配列 */
-    this._colorList = [
-      0xffff00,
-      0xffffdd,
-      0xffffff
-    ];
 
-    for(let index = 0; index < 3000; index++) {
+    // 数分のパーティクルを生成
+    for(let index = 0; index < ParticleEmitter.PARTICLE_NUM; index++) {
       let particle = this._createParticle();
       this.add(particle);
+      // ストアに追加
       this._particleStore.push(particle);
     }
   }
@@ -37,8 +47,9 @@ export default class ParticleEmitter extends THREE.Object3D {
    */
   _createParticle() {
     let rand = Math.floor(Math.random() * 3)
-    let color = this._colorList[rand];
+    let color = ParticleEmitter.COLOR_LIST[rand];
 
+    // マテリアル
     var material = new THREE.SpriteMaterial({
       color: color,
       map: this._texture,
@@ -47,13 +58,13 @@ export default class ParticleEmitter extends THREE.Object3D {
       opacity: 0.3
     });
 
+    // スプライト
     var sprite = new THREE.Sprite(material);
 
     // 半径10の球の表面にランダムに配置
     let phi = Math.random() * 180;
     let theta = Math.random() * 180;
-    let radius = 50;
-
+    let radius = ParticleEmitter.RADIUS;
     sprite.position.x = radius * Math.cos(phi) * Math.cos(theta) * -1;
     sprite.position.y = radius * Math.sin(phi);
     sprite.position.z = radius * Math.cos(phi) * Math.sin(theta);
@@ -67,11 +78,14 @@ export default class ParticleEmitter extends THREE.Object3D {
   /**
    * フレーム毎の更新です。
    */
-  update(lightFrontVector) {
+  update(lightFrontVector, aperture) {
     let target = lightFrontVector.clone();
+    // 全てのパーティクルに対して照らされているか判定
     _.each(this._particleStore, (particle) => {
       let dot = particle.position.clone().normalize().dot(target);
-      particle.material.opacity = (dot - 0.8) / 0.2 * Math.random();
+      let opacity = (dot - (1 - aperture)) / aperture;
+      opacity *= Math.random(); // ちらつかせる
+      particle.material.opacity = opacity;
     });
   }
 }
