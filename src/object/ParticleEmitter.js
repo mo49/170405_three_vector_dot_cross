@@ -30,7 +30,7 @@ export default class ParticleEmitter extends THREE.Object3D {
     super();
 
     // テクスチャ
-    var loader = new THREE.TextureLoader();
+    let loader = new THREE.TextureLoader();
     this._texture = loader.load('imgs/particle.png');
 
     // 数分のパーティクルを生成
@@ -51,7 +51,7 @@ export default class ParticleEmitter extends THREE.Object3D {
     let color = ParticleEmitter.COLOR_LIST[rand];
 
     // マテリアル
-    var material = new THREE.SpriteMaterial({
+    let material = new THREE.SpriteMaterial({
       color: color,
       map: this._texture,
       transparent: true,
@@ -60,13 +60,13 @@ export default class ParticleEmitter extends THREE.Object3D {
     });
 
     // スプライト
-    var sprite = new THREE.Sprite(material);
+    let sprite = new THREE.Sprite(material);
 
     // 球の表面にランダムに配置
-    let phi = (Math.random() * 360) * Math.PI / 180;
+    let phi = ((Math.random() * 180) - 90) * Math.PI / 180;
     let theta = (Math.random() * 360) * Math.PI / 180;
     let radius = ParticleEmitter.RADIUS;
-    sprite.position.x = radius * Math.cos(phi) * Math.cos(theta) * -1;
+    sprite.position.x = radius * Math.cos(phi) * Math.cos(theta);
     sprite.position.y = radius * Math.sin(phi);
     sprite.position.z = radius * Math.cos(phi) * Math.sin(theta);
 
