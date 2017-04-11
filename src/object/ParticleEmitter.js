@@ -63,8 +63,8 @@ export default class ParticleEmitter extends THREE.Object3D {
     var sprite = new THREE.Sprite(material);
 
     // 球の表面にランダムに配置
-    let phi = Math.random() * 180;
-    let theta = Math.random() * 180;
+    let phi = (Math.random() * 360) * Math.PI / 180;
+    let theta = (Math.random() * 360) * Math.PI / 180;
     let radius = ParticleEmitter.RADIUS;
     sprite.position.x = radius * Math.cos(phi) * Math.cos(theta) * -1;
     sprite.position.y = radius * Math.sin(phi);
