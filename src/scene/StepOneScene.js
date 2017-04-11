@@ -13,7 +13,7 @@ export default class StepOneScene extends THREE.Scene {
   /** 懐中電灯 */
   _flashLight;
   /** パーティクルエミッター */
-  _particleEmiiter;
+  _particleEmitter;
 
   /**
    * コンストラクター
@@ -37,8 +37,8 @@ export default class StepOneScene extends THREE.Scene {
     this.add(this._flashLight);
 
     // パーティクルエミッター
-    this._particleEmiiter = new ParticleEmitter();
-    this.add(this._particleEmiiter);
+    this._particleEmitter = new ParticleEmitter();
+    this.add(this._particleEmitter);
   }
 
   /**
@@ -52,7 +52,7 @@ export default class StepOneScene extends THREE.Scene {
     this._flashLight.update();
 
     // パーティクルを更新
-    this._particleEmiiter.update(
+    this._particleEmitter.update(
       this._flashLight.frontVector,
       this._flashLight.aperture
     );

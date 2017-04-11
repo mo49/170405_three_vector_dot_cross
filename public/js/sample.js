@@ -61047,8 +61047,8 @@ var StepOneScene = function (_THREE$Scene) {
     _this.add(_this._flashLight);
 
     // パーティクルエミッター
-    _this._particleEmiiter = new _ParticleEmitter2.default();
-    _this.add(_this._particleEmiiter);
+    _this._particleEmitter = new _ParticleEmitter2.default();
+    _this.add(_this._particleEmitter);
     return _this;
   }
 
@@ -61072,7 +61072,7 @@ var StepOneScene = function (_THREE$Scene) {
       this._flashLight.update();
 
       // パーティクルを更新
-      this._particleEmiiter.update(this._flashLight.frontVector, this._flashLight.aperture);
+      this._particleEmitter.update(this._flashLight.frontVector, this._flashLight.aperture);
     }
   }]);
 
