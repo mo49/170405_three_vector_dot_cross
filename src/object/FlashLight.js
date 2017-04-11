@@ -51,7 +51,7 @@ export default class FlashLight extends THREE.Object3D {
     let loader = new THREE.TextureLoader();
     let beamTexture = loader.load('imgs/beam.png');
     let beam = new THREE.Mesh(
-      new THREE.CylinderBufferGeometry(15, 0.5, 20, 10, 10, true),
+      new THREE.CylinderBufferGeometry(15, 0.5, 20, 40, 10, true),
       new THREE.MeshBasicMaterial({
         color: 0xFFFF55,
         opacity: 0.3,

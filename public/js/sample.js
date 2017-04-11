@@ -60726,7 +60726,7 @@ var FlashLight = function (_THREE$Object3D) {
     // ビーム
     var loader = new THREE.TextureLoader();
     var beamTexture = loader.load('imgs/beam.png');
-    var beam = new THREE.Mesh(new THREE.CylinderBufferGeometry(15, 0.5, 20, 10, 10, true), new THREE.MeshBasicMaterial({
+    var beam = new THREE.Mesh(new THREE.CylinderBufferGeometry(15, 0.5, 20, 40, 10, true), new THREE.MeshBasicMaterial({
       color: 0xFFFF55,
       opacity: 0.3,
       transparent: true,
