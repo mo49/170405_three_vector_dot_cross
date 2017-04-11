@@ -60863,7 +60863,7 @@ var ParticleEmitter = function (_THREE$Object3D) {
       var phi = (Math.random() * 180 - 90) * Math.PI / 180;
       var theta = Math.random() * 360 * Math.PI / 180;
       var radius = ParticleEmitter.RADIUS;
-      sprite.position.x = radius * Math.cos(phi) * Math.cos(theta);
+      sprite.position.x = radius * Math.cos(phi) * Math.cos(theta) * -1;
       sprite.position.y = radius * Math.sin(phi);
       sprite.position.z = radius * Math.cos(phi) * Math.sin(theta);
 
