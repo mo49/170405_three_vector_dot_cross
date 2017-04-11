@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import StepOneScene from './scene/StepOneScene';
 import StepTwoScene from './scene/StepTwoScene';
 import Camera from './camera/Camera';
-import TWEEN from 'tween.js';
 
 /**
  * メインアプリクラスです。
@@ -40,6 +39,7 @@ module.exports = class App {
     this._renderer.setPixelRatio(1);
     this._wrapper.appendChild(this._renderer.domElement);
 
+    // リサイズ
     this._resize();
     window.addEventListener('resize', this._resize);
 
@@ -52,8 +52,6 @@ module.exports = class App {
    */
   _update() {
     requestAnimationFrame(this._update);
-    // TWEENの更新
-    TWEEN.update();
     // シーンの更新
     this._scene.update();
     // 描画
