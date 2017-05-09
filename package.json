@@ -15,7 +15,7 @@
     "browserify": "^13.3.0",
     "lite-server": "^2.3.0",
     "lodash": "^4.17.4",
-    "three": "^0.84.0",
+    "three": "^0.85.0",
     "watchify": "^3.9.0"
   }
 }
