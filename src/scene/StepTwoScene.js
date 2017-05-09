@@ -4,9 +4,9 @@ import Truck from '../object/Truck';
 import Course from '../object/Course';
 
 /**
- * ステップ１シーンクラスです。
+ * ステップ２シーンクラスです。
  */
-export default class StepOneScene extends THREE.Scene {
+export default class StepTwoScene extends THREE.Scene {
 
   /**
    * コンストラクター
