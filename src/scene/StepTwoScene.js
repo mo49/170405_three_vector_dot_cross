@@ -54,7 +54,9 @@ export default class StepTwoScene extends THREE.Scene {
   update() {
     this._camera.update();
     this._frame++;
-    if(this._frame > 360) {
+
+    // フレーム数が360以上であれば0に戻す
+    if(this._frame > 359) {
       this._frame = 0;
     }
 
@@ -73,9 +75,9 @@ export default class StepTwoScene extends THREE.Scene {
   /**
    * ポイントから法線を算出します。
    */
-  _getNormal(curentPoint, nextPoint) {
-    let frontVec = curentPoint.clone().sub(nextPoint).normalize();
-    let sideVec = new THREE.Vector3(0, 0, -1);
+  _getNormal(currentPoint, nextPoint) {
+    let frontVec = nextPoint.clone().sub(currentPoint).normalize();
+    let sideVec = new THREE.Vector3(0, 0, 1);
     let normalVec = frontVec.cross(sideVec);
 
     return normalVec;

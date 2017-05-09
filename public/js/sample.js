@@ -61580,9 +61580,9 @@ var StepTwoScene = function (_THREE$Scene) {
 
   }, {
     key: '_getNormal',
-    value: function _getNormal(curentPoint, nextPoint) {
-      var frontVec = curentPoint.clone().sub(nextPoint).normalize();
-      var sideVec = new THREE.Vector3(0, 0, -1);
+    value: function _getNormal(currentPoint, nextPoint) {
+      var frontVec = nextPoint.clone().sub(currentPoint).normalize();
+      var sideVec = new THREE.Vector3(0, 0, 1);
       var normalVec = frontVec.cross(sideVec);
 
       return normalVec;

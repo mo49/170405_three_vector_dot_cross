@@ -17,7 +17,7 @@ export default class Course extends THREE.Object3D {
 
     this._points = [];
     let radius = 5;
-    for(let index = 0; index < 362; index++) {
+    for(let index = 0; index < 361; index++) {
       let rad = index * Math.PI / 180;
 
       let sin = Math.sin(rad * 3);
