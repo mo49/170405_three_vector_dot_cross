@@ -3,20 +3,14 @@ import Camera from '../camera/Camera';
 import Truck from '../object/Truck';
 import Course from '../object/Course';
 
-/**
- * ステップ２シーンクラスです。
- */
 export default class StepTwoScene extends THREE.Scene {
 
-  /**
-   * コンストラクター
-   * @constructor
-   */
   constructor() {
     super();
 
     this._handleAngle = 0;
     this._frame = 0;
+    this._deltaStock = 0;
 
     // カメラ
     this._camera = Camera.instance;
@@ -40,23 +34,25 @@ export default class StepTwoScene extends THREE.Scene {
     // コース
     this._course = new Course();
     this.add(this._course);
+    this._courseLength = this._course.points.length;
 
     // トロッコ
     this._truck = new Truck();
     this._truck.scale.multiplyScalar(0.5)
-    this._truck.position.copy(this._course.points[0]);
+    this._truck.position.copy(this._course.points[0]); // 初期地点
     this.add(this._truck);
   }
 
-  /**
-   * 更新します。
-   */
-  update() {
+  update(time,delta) {
     this._camera.update();
-    this._frame++;
+    this._deltaStock += delta;
+    if (this._deltaStock > 30/1000) {
+      this._frame++;
+      this._deltaStock = 0;
+    }
 
     // フレーム数が360以上であれば0に戻す
-    if(this._frame > 359) {
+    if(this._frame >= this._courseLength - 1) {
       this._frame = 0;
     }
 
@@ -69,6 +65,7 @@ export default class StepTwoScene extends THREE.Scene {
     // トラックの位置を修正
     this._truck.position.copy(this._course.points[this._frame]);
     this._truck.up.set(normal.x, normal.y, normal.z);
+    // 正面を向く
     this._truck.lookAt(this._course.points[this._frame + 1]);
   }
 
@@ -78,6 +75,7 @@ export default class StepTwoScene extends THREE.Scene {
   _getNormal(currentPoint, nextPoint) {
     let frontVec = nextPoint.clone().sub(currentPoint).normalize();
     let sideVec = new THREE.Vector3(0, 0, 1);
+    // let sideVec = new THREE.Vector3(0, 0, -1); // 逆さま
     let normalVec = frontVec.cross(sideVec);
 
     return normalVec;

@@ -1,14 +1,7 @@
 import * as THREE from 'three';
 
-/**
- * トロッコクラスです。
- */
 export default class Truck extends THREE.Object3D {
 
-  /**
-   * コンストラクター
-   * @constructor
-   */
   constructor() {
     super();
 
@@ -47,9 +40,6 @@ export default class Truck extends THREE.Object3D {
     this.add(wheel2);
   }
 
-  /**
-   * フレーム毎の更新をします。
-   */
   update() {
 
   }

@@ -61075,9 +61075,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/**
- * コースクラスです。
- */
 var Course = function (_THREE$Object3D) {
   _inherits(Course, _THREE$Object3D);
 
@@ -61089,12 +61086,6 @@ var Course = function (_THREE$Object3D) {
     get: function get() {
       return this._points;
     }
-
-    /**
-     * コンストラクター
-     * @constructor
-     */
-
   }]);
 
   function Course() {
@@ -61107,7 +61098,7 @@ var Course = function (_THREE$Object3D) {
     for (var index = 0; index < 361; index++) {
       var rad = index * Math.PI / 180;
 
-      var sin = Math.sin(rad * 3);
+      var sin = Math.sin(rad * 5);
 
       var x = radius * Math.cos(rad) * 2 + sin * 2;
       var y = radius * Math.sin(rad) + sin * 3;
@@ -61118,8 +61109,10 @@ var Course = function (_THREE$Object3D) {
       color: 0xff0000
     });
 
+    // geometryに頂点情報を登録
     var geometry = new THREE.Geometry();
     geometry.vertices = _this._points;
+    console.log(geometry);
 
     var line = new THREE.Line(geometry, material);
     _this.add(line);
@@ -61450,16 +61443,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/**
- * トロッコクラスです。
- */
 var Truck = function (_THREE$Object3D) {
   _inherits(Truck, _THREE$Object3D);
 
-  /**
-   * コンストラクター
-   * @constructor
-   */
   function Truck() {
     _classCallCheck(this, Truck);
 
@@ -61491,11 +61477,6 @@ var Truck = function (_THREE$Object3D) {
     _this.add(wheel2);
     return _this;
   }
-
-  /**
-   * フレーム毎の更新をします。
-   */
-
 
   _createClass(Truck, [{
     key: 'update',
@@ -61632,16 +61613,9 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/**
- * ステップ２シーンクラスです。
- */
 var StepTwoScene = function (_THREE$Scene) {
   _inherits(StepTwoScene, _THREE$Scene);
 
-  /**
-   * コンストラクター
-   * @constructor
-   */
   function StepTwoScene() {
     _classCallCheck(this, StepTwoScene);
 
@@ -61649,6 +61623,7 @@ var StepTwoScene = function (_THREE$Scene) {
 
     _this._handleAngle = 0;
     _this._frame = 0;
+    _this._deltaStock = 0;
 
     // カメラ
     _this._camera = _Camera2.default.instance;
@@ -61672,28 +61647,28 @@ var StepTwoScene = function (_THREE$Scene) {
     // コース
     _this._course = new _Course2.default();
     _this.add(_this._course);
+    _this._courseLength = _this._course.points.length;
 
     // トロッコ
     _this._truck = new _Truck2.default();
     _this._truck.scale.multiplyScalar(0.5);
-    _this._truck.position.copy(_this._course.points[0]);
+    _this._truck.position.copy(_this._course.points[0]); // 初期地点
     _this.add(_this._truck);
     return _this;
   }
 
-  /**
-   * 更新します。
-   */
-
-
   _createClass(StepTwoScene, [{
     key: 'update',
-    value: function update() {
+    value: function update(time, delta) {
       this._camera.update();
-      this._frame++;
+      this._deltaStock += delta;
+      if (this._deltaStock > 30 / 1000) {
+        this._frame++;
+        this._deltaStock = 0;
+      }
 
       // フレーム数が360以上であれば0に戻す
-      if (this._frame > 359) {
+      if (this._frame >= this._courseLength - 1) {
         this._frame = 0;
       }
 
@@ -61703,6 +61678,7 @@ var StepTwoScene = function (_THREE$Scene) {
       // トラックの位置を修正
       this._truck.position.copy(this._course.points[this._frame]);
       this._truck.up.set(normal.x, normal.y, normal.z);
+      // 正面を向く
       this._truck.lookAt(this._course.points[this._frame + 1]);
     }
 
@@ -61715,6 +61691,7 @@ var StepTwoScene = function (_THREE$Scene) {
     value: function _getNormal(currentPoint, nextPoint) {
       var frontVec = nextPoint.clone().sub(currentPoint).normalize();
       var sideVec = new THREE.Vector3(0, 0, 1);
+      // let sideVec = new THREE.Vector3(0, 0, -1); // 逆さま
       var normalVec = frontVec.cross(sideVec);
 
       return normalVec;
