@@ -64,8 +64,9 @@ export default class StepTwoScene extends THREE.Scene {
 
     // トラックの位置を修正
     this._truck.position.copy(this._course.points[this._frame]);
+    // トロッコの上向きベクトルを更新
     this._truck.up.set(normal.x, normal.y, normal.z);
-    // 正面を向く
+    // 正面を向く（上向きベクトルの変更を反映させる）
     this._truck.lookAt(this._course.points[this._frame + 1]);
   }
 
@@ -73,10 +74,9 @@ export default class StepTwoScene extends THREE.Scene {
    * ポイントから法線を算出します。
    */
   _getNormal(currentPoint, nextPoint) {
-    let frontVec = nextPoint.clone().sub(currentPoint).normalize();
-    let sideVec = new THREE.Vector3(0, 0, 1);
-    // let sideVec = new THREE.Vector3(0, 0, -1); // 逆さま
-    let normalVec = frontVec.cross(sideVec);
+    let frontVec = nextPoint.clone().sub(currentPoint).normalize(); // x
+    let sideVec = new THREE.Vector3(0, 0, 1); // z
+    let normalVec = frontVec.cross(sideVec); // y
 
     return normalVec;
   }

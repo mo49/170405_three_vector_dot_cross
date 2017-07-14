@@ -61677,8 +61677,9 @@ var StepTwoScene = function (_THREE$Scene) {
 
       // トラックの位置を修正
       this._truck.position.copy(this._course.points[this._frame]);
+      // トロッコの上向きベクトルを更新
       this._truck.up.set(normal.x, normal.y, normal.z);
-      // 正面を向く
+      // 正面を向く（上向きベクトルの変更を反映させる）
       this._truck.lookAt(this._course.points[this._frame + 1]);
     }
 
@@ -61689,10 +61690,9 @@ var StepTwoScene = function (_THREE$Scene) {
   }, {
     key: '_getNormal',
     value: function _getNormal(currentPoint, nextPoint) {
-      var frontVec = nextPoint.clone().sub(currentPoint).normalize();
-      var sideVec = new THREE.Vector3(0, 0, 1);
-      // let sideVec = new THREE.Vector3(0, 0, -1); // 逆さま
-      var normalVec = frontVec.cross(sideVec);
+      var frontVec = nextPoint.clone().sub(currentPoint).normalize(); // x
+      var sideVec = new THREE.Vector3(0, 0, 1); // z
+      var normalVec = frontVec.cross(sideVec); // y
 
       return normalVec;
     }
