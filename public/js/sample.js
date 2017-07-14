@@ -61156,6 +61156,8 @@ var Cube = function (_THREE$Object3D) {
   _inherits(Cube, _THREE$Object3D);
 
   function Cube() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
     _classCallCheck(this, Cube);
 
     var _this = _possibleConstructorReturn(this, (Cube.__proto__ || Object.getPrototypeOf(Cube)).call(this));
@@ -61164,8 +61166,9 @@ var Cube = function (_THREE$Object3D) {
 
 
     var cube = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshLambertMaterial({ color: 0xFBBC05 }));
-    cube.position.set(Math.random() * 20, Math.random() * 20, Math.random() * 20);
     _this.add(cube);
+
+    _this.position.set(opts.x || Math.random() * 20, opts.y || Math.random() * 20, opts.z || Math.random() * 20);
     return _this;
   }
 
@@ -61176,8 +61179,7 @@ var Cube = function (_THREE$Object3D) {
       this._angle += delta * Cube.ROTATION_SPEED;
       var radian = this._angle * Math.PI / 180;
 
-      this.rotation.x = radian * 0.5;
-      this.rotation.z = radian;
+      this.rotation.set(radian, radian * 0.5, radian * 0.3);
     }
   }]);
 
