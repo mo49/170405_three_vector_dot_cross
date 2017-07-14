@@ -14,11 +14,11 @@ module.exports = class App {
 
   constructor(step) {
 
-    const that = this;
-
     this._update = this._update.bind(this);
     this._render = this._render.bind(this);
     this._tick = this._tick.bind(this);
+    this._stop = this._stop.bind(this);
+    this._restart = this._restart.bind(this);
     this._resize = this._resize.bind(this);
     this._change = this._change.bind(this);
 
@@ -26,10 +26,6 @@ module.exports = class App {
 
     // シーン
     this._change(step);
-    $('.js-change-scene').on('click', function() {
-      const sceneId = parseInt(this.getAttribute('data-scene'));
-      that._change(sceneId);
-    })
 
     // カメラ
     this._camera = Camera.instance;
@@ -48,6 +44,18 @@ module.exports = class App {
     this.timeAccumulator = new TimeAccumulator(this._update,App.FPS);
     this.timeSkipper = new TimeSkipper(this._render,App.FPS);
     this._tick();
+
+    this._initListener();
+  }
+
+  _initListener() {
+    const that = this;
+    $('.js-change-scene').on('click', function() {
+      const sceneId = parseInt(this.getAttribute('data-scene'));
+      that._change(sceneId);
+    })
+    $('.js-stop').on('click', this._stop);
+    $('.js-restart').on('click', this._restart);
   }
 
   _update(time,delta) {
@@ -60,15 +68,17 @@ module.exports = class App {
     const currentTime = time / 1000; // sec
     this.timeAccumulator.exec(currentTime);
     this.timeSkipper.exec(currentTime);
-    requestAnimationFrame(this._tick);
+    this.loopId = requestAnimationFrame(this._tick);
   }
-
-  _change(step) {
-    switch(step) {
-      case 1: this._scene = new StepOneScene(); break;
-      case 2: this._scene = new StepTwoScene(); break;
-      default: this._scene = new SampleScene();
-    };
+  _stop() {
+    cancelAnimationFrame(this.loopId);
+  }
+  _restart() {
+    // deltaのズレを補正
+    const currentTime = performance.now() / 1000;
+    this.timeAccumulator.reset(currentTime);
+    this.timeSkipper.reset(currentTime);
+    this._tick();
   }
 
   _resize() {
@@ -80,5 +90,13 @@ module.exports = class App {
     this._renderer.setPixelRatio(App.DPR);
     this._camera.aspect = width / height;
     this._camera.updateProjectionMatrix();
+  }
+
+  _change(step) {
+    switch(step) {
+      case 1: this._scene = new StepOneScene(); break;
+      case 2: this._scene = new StepTwoScene(); break;
+      default: this._scene = new SampleScene();
+    };
   }
 }

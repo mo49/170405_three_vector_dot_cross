@@ -71076,11 +71076,11 @@ module.exports = (_temp = _class = function () {
   function App(step) {
     _classCallCheck(this, App);
 
-    var that = this;
-
     this._update = this._update.bind(this);
     this._render = this._render.bind(this);
     this._tick = this._tick.bind(this);
+    this._stop = this._stop.bind(this);
+    this._restart = this._restart.bind(this);
     this._resize = this._resize.bind(this);
     this._change = this._change.bind(this);
 
@@ -71088,10 +71088,6 @@ module.exports = (_temp = _class = function () {
 
     // シーン
     this._change(step);
-    (0, _jquery2.default)('.js-change-scene').on('click', function () {
-      var sceneId = parseInt(this.getAttribute('data-scene'));
-      that._change(sceneId);
-    });
 
     // カメラ
     this._camera = _Camera2.default.instance;
@@ -71110,9 +71106,22 @@ module.exports = (_temp = _class = function () {
     this.timeAccumulator = new _TimeAccumulator2.default(this._update, App.FPS);
     this.timeSkipper = new _TimeSkipper2.default(this._render, App.FPS);
     this._tick();
+
+    this._initListener();
   }
 
   _createClass(App, [{
+    key: '_initListener',
+    value: function _initListener() {
+      var that = this;
+      (0, _jquery2.default)('.js-change-scene').on('click', function () {
+        var sceneId = parseInt(this.getAttribute('data-scene'));
+        that._change(sceneId);
+      });
+      (0, _jquery2.default)('.js-stop').on('click', this._stop);
+      (0, _jquery2.default)('.js-restart').on('click', this._restart);
+    }
+  }, {
     key: '_update',
     value: function _update(time, delta) {
       this._scene.update(time, delta);
@@ -71128,19 +71137,21 @@ module.exports = (_temp = _class = function () {
       var currentTime = time / 1000; // sec
       this.timeAccumulator.exec(currentTime);
       this.timeSkipper.exec(currentTime);
-      requestAnimationFrame(this._tick);
+      this.loopId = requestAnimationFrame(this._tick);
     }
   }, {
-    key: '_change',
-    value: function _change(step) {
-      switch (step) {
-        case 1:
-          this._scene = new _StepOneScene2.default();break;
-        case 2:
-          this._scene = new _StepTwoScene2.default();break;
-        default:
-          this._scene = new _SampleScene2.default();
-      };
+    key: '_stop',
+    value: function _stop() {
+      cancelAnimationFrame(this.loopId);
+    }
+  }, {
+    key: '_restart',
+    value: function _restart() {
+      // deltaのズレを補正
+      var currentTime = performance.now() / 1000;
+      this.timeAccumulator.reset(currentTime);
+      this.timeSkipper.reset(currentTime);
+      this._tick();
     }
   }, {
     key: '_resize',
@@ -71153,6 +71164,18 @@ module.exports = (_temp = _class = function () {
       this._renderer.setPixelRatio(App.DPR);
       this._camera.aspect = width / height;
       this._camera.updateProjectionMatrix();
+    }
+  }, {
+    key: '_change',
+    value: function _change(step) {
+      switch (step) {
+        case 1:
+          this._scene = new _StepOneScene2.default();break;
+        case 2:
+          this._scene = new _StepTwoScene2.default();break;
+        default:
+          this._scene = new _SampleScene2.default();
+      };
     }
   }]);
 

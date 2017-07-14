@@ -26,10 +26,24 @@
       padding: 10px;
       cursor: pointer;
     }
+    .controller{
+      position: fixed;
+      top: 0; left: 0;
+      color: #333;
+    }
+    .controller span{
+      background-color: #eee;
+      padding: 10px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="app"></div>
+  <div class="controller">
+    <span class="js-stop">STOP</span>
+    <span class="js-restart">RESTART</span>
+  </div>
   <div class="scenes">
     <span class="js-change-scene" data-scene="1">SCENE1</span>
     <span class="js-change-scene" data-scene="2">SCENE2</span>
