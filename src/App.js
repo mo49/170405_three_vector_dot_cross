@@ -8,6 +8,7 @@ import TimeSkipper from './lib/TimeSkipper';
 module.exports = class App {
 
   static FPS = 60;
+  static DPR = window.devicePixelRatio || 1;
 
   constructor(step) {
 
@@ -62,6 +63,7 @@ module.exports = class App {
     this._renderer.domElement.setAttribute('width', String(width));
     this._renderer.domElement.setAttribute('height', String(height));
     this._renderer.setSize(width, height);
+    this._renderer.setPixelRatio(App.DPR);
     this._camera.aspect = width / height;
     this._camera.updateProjectionMatrix();
   }

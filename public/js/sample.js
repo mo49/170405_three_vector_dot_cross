@@ -60873,13 +60873,14 @@ module.exports = (_temp = _class = function () {
       this._renderer.domElement.setAttribute('width', String(width));
       this._renderer.domElement.setAttribute('height', String(height));
       this._renderer.setSize(width, height);
+      this._renderer.setPixelRatio(App.DPR);
       this._camera.aspect = width / height;
       this._camera.updateProjectionMatrix();
     }
   }]);
 
   return App;
-}(), _class.FPS = 60, _temp);
+}(), _class.FPS = 60, _class.DPR = window.devicePixelRatio || 1, _temp);
 
 },{"./camera/Camera":4,"./lib/TimeAccumulator":5,"./lib/TimeSkipper":6,"./scene/StepOneScene":12,"./scene/StepTwoScene":13,"three":2}],4:[function(require,module,exports){
 'use strict';
