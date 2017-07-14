@@ -6,7 +6,7 @@ import * as THREE from 'three';
 export default class FlashLight extends THREE.Object3D {
 
   /** 回転スピード */
-  static ROTATION_SPEED = 2.5;
+  static ROTATION_SPEED = 25;
 
   /** 正面ベクトル */
   _frontVector = new THREE.Vector3(0, 1, 0);
@@ -70,9 +70,9 @@ export default class FlashLight extends THREE.Object3D {
   /**
    * フレーム毎のアップデートをします。
    */
-  update() {
+  update(time,delta) {
     // 角度をインクリメント
-    this._angle += FlashLight.ROTATION_SPEED;
+    this._angle += delta * FlashLight.ROTATION_SPEED;
     let radian = this._angle * Math.PI / 180;
 
     // ライトを回転

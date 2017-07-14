@@ -60777,6 +60777,8 @@
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _class, _temp;
+
 var _three = require('three');
 
 var THREE = _interopRequireWildcard(_three);
@@ -60793,38 +60795,37 @@ var _Camera = require('./camera/Camera');
 
 var _Camera2 = _interopRequireDefault(_Camera);
 
+var _TimeAccumulator = require('./lib/TimeAccumulator');
+
+var _TimeAccumulator2 = _interopRequireDefault(_TimeAccumulator);
+
+var _TimeSkipper = require('./lib/TimeSkipper');
+
+var _TimeSkipper2 = _interopRequireDefault(_TimeSkipper);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-/**
- * メインアプリクラスです。
- */
-module.exports = function () {
-
-  /**
-   * コンストラクター
-   * @constructor
-   */
+module.exports = (_temp = _class = function () {
   function App(step) {
     _classCallCheck(this, App);
 
     this._update = this._update.bind(this);
+    this._render = this._render.bind(this);
+    this._tick = this._tick.bind(this);
     this._resize = this._resize.bind(this);
 
-    // DOM
     this._wrapper = document.getElementById('app');
 
     // シーン
     switch (step) {
       case 1:
-        this._scene = new _StepOneScene2.default();
-        break;
+        this._scene = new _StepOneScene2.default();break;
       case 2:
-        this._scene = new _StepTwoScene2.default();
-        break;
+        this._scene = new _StepTwoScene2.default();break;
     };
 
     // カメラ
@@ -60840,29 +60841,30 @@ module.exports = function () {
     this._resize();
     window.addEventListener('resize', this._resize);
 
-    // フレーム毎の更新
-    this._update();
+    // 更新と描画
+    this.timeAccumulator = new _TimeAccumulator2.default(this._update, App.FPS);
+    this.timeSkipper = new _TimeSkipper2.default(this._render, App.FPS);
+    this._tick();
   }
-
-  /**
-   * フレーム毎の更新です。
-   */
-
 
   _createClass(App, [{
     key: '_update',
-    value: function _update() {
-      requestAnimationFrame(this._update);
-      // シーンの更新
-      this._scene.update();
-      // 描画
+    value: function _update(time, delta) {
+      this._scene.update(time, delta);
+    }
+  }, {
+    key: '_render',
+    value: function _render(time, delta) {
       this._renderer.render(this._scene, this._camera);
     }
-
-    /**
-     * リサイズをかけます。
-     */
-
+  }, {
+    key: '_tick',
+    value: function _tick(time) {
+      var currentTime = time / 1000; // sec
+      this.timeAccumulator.exec(currentTime);
+      this.timeSkipper.exec(currentTime);
+      requestAnimationFrame(this._tick);
+    }
   }, {
     key: '_resize',
     value: function _resize() {
@@ -60877,9 +60879,9 @@ module.exports = function () {
   }]);
 
   return App;
-}();
+}(), _class.FPS = 60, _temp);
 
-},{"./camera/Camera":4,"./scene/StepOneScene":9,"./scene/StepTwoScene":10,"three":2}],4:[function(require,module,exports){
+},{"./camera/Camera":4,"./lib/TimeAccumulator":5,"./lib/TimeSkipper":6,"./scene/StepOneScene":12,"./scene/StepTwoScene":13,"three":2}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -60953,6 +60955,106 @@ var Camera = function (_THREE$PerspectiveCam) {
 exports.default = Camera;
 
 },{"three":2}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// exec(time)
+// で経過時間分だけfuncを呼び出すクラス
+// 遅い端末でも問題なくプレイできるように
+// updateにこいつをかませる
+
+var LIMIT_FUNC_CALL_PER_EXEC = 6; // 1回のexecで6回以上は呼ばない
+
+var TimeAccumulator = function () {
+  function TimeAccumulator(func, fps) {
+    _classCallCheck(this, TimeAccumulator);
+
+    this._func = func;
+    this._prev_time = 0;
+    this._time_unit = 1 / fps;
+  }
+
+  _createClass(TimeAccumulator, [{
+    key: "reset",
+    value: function reset(time) {
+      this._prev_time = time;
+    }
+  }, {
+    key: "exec",
+    value: function exec(time) {
+      var call_count = 0;
+      while (this._prev_time < time && call_count < LIMIT_FUNC_CALL_PER_EXEC) {
+        this._func(this._prev_time, this._time_unit);
+        this._prev_time += this._time_unit;
+        call_count += 1;
+      }
+
+      if (call_count >= LIMIT_FUNC_CALL_PER_EXEC && this._prev_time < time) {
+        // LIMITの回数だけ実行しても追いつかないときは全て飛ばす
+        // キング・クリムゾン
+        this._func(time, time - this._prev_time);
+        this._prev_time = time;
+      }
+    }
+  }]);
+
+  return TimeAccumulator;
+}();
+
+exports.default = TimeAccumulator;
+
+},{}],6:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+// exec(time)
+// で経過時間分ごとにfuncを呼び出す
+
+var TimeSkipper = function () {
+  function TimeSkipper(func, fps) {
+    _classCallCheck(this, TimeSkipper);
+
+    this._func = func;
+    this._prev_time = 0;
+    this._time_unit = 1 / fps;
+  }
+
+  _createClass(TimeSkipper, [{
+    key: "reset",
+    value: function reset(time) {
+      this._prev_time = time;
+    }
+  }, {
+    key: "exec",
+    value: function exec(time) {
+      var elapsed_time = time - this._prev_time;
+      if (elapsed_time > this._time_unit) {
+        this._func(this._prev_time, elapsed_time);
+        this._prev_time = time;
+      }
+    }
+  }]);
+
+  return TimeSkipper;
+}();
+
+exports.default = TimeSkipper;
+
+},{}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61029,7 +61131,63 @@ var Course = function (_THREE$Object3D) {
 
 exports.default = Course;
 
-},{"three":2}],6:[function(require,module,exports){
+},{"three":2}],8:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _three = require('three');
+
+var THREE = _interopRequireWildcard(_three);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Cube = function (_THREE$Object3D) {
+  _inherits(Cube, _THREE$Object3D);
+
+  function Cube() {
+    _classCallCheck(this, Cube);
+
+    var _this = _possibleConstructorReturn(this, (Cube.__proto__ || Object.getPrototypeOf(Cube)).call(this));
+
+    _this._angle = 0;
+
+
+    var cube = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshLambertMaterial({ color: 0xFBBC05 }));
+    cube.position.set(Math.random() * 30, Math.random() * 30, Math.random() * 30);
+    _this.add(cube);
+    return _this;
+  }
+
+  _createClass(Cube, [{
+    key: 'update',
+    value: function update(time, delta) {
+      // 角度をインクリメント
+      this._angle += delta * Cube.ROTATION_SPEED;
+      var radian = this._angle * Math.PI / 180;
+
+      this.rotation.x = radian * 0.5;
+      // this.rotation.z = radian;
+    }
+  }]);
+
+  return Cube;
+}(THREE.Object3D);
+
+Cube.ROTATION_SPEED = 100;
+exports.default = Cube;
+
+},{"three":2}],9:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61132,9 +61290,9 @@ var FlashLight = function (_THREE$Object3D) {
 
   _createClass(FlashLight, [{
     key: 'update',
-    value: function update() {
+    value: function update(time, delta) {
       // 角度をインクリメント
-      this._angle += FlashLight.ROTATION_SPEED;
+      this._angle += delta * FlashLight.ROTATION_SPEED;
       var radian = this._angle * Math.PI / 180;
 
       // ライトを回転
@@ -61150,10 +61308,10 @@ var FlashLight = function (_THREE$Object3D) {
   return FlashLight;
 }(THREE.Object3D);
 
-FlashLight.ROTATION_SPEED = 2.5;
+FlashLight.ROTATION_SPEED = 25;
 exports.default = FlashLight;
 
-},{"three":2}],7:[function(require,module,exports){
+},{"three":2}],10:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61176,17 +61334,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/**
- * パーティクルエミッタークラスです。
- */
 var ParticleEmitter = function (_THREE$Object3D) {
   _inherits(ParticleEmitter, _THREE$Object3D);
-
-  /**
-   * コンストラクター
-   * @constructor
-   */
-
 
   /** パーティクルの入れ物 */
 
@@ -61211,11 +61360,6 @@ var ParticleEmitter = function (_THREE$Object3D) {
     }
     return _this;
   }
-
-  /**
-   * 粒を生成します。
-   */
-
   /** テクスチャー */
 
   /** 球の半径 */
@@ -61256,11 +61400,6 @@ var ParticleEmitter = function (_THREE$Object3D) {
 
       return sprite;
     }
-
-    /**
-     * フレーム毎の更新です。
-     */
-
   }, {
     key: 'update',
     value: function update(lightFrontVector, aperture) {
@@ -61268,7 +61407,11 @@ var ParticleEmitter = function (_THREE$Object3D) {
       // 全てのパーティクルに対して照らされているか判定
       _lodash._.each(this._particleStore, function (particle) {
         // 絞り値から透明度の割合を算出
+        // 「懐中電灯の正面ベクトル」と「パーティクルの位置ベクトル」の方向が
+        // 近ければ近いほどパーティクルの不透明度が1に近づいていく
         var dot = particle.position.clone().normalize().dot(target);
+        // 内積は計算結果がベクトルではなく数値になる
+        // 表示される範囲が広すぎるため少し狭める 0.8 ~ 1.0
         var opacity = (dot - (1 - aperture)) / aperture;
         // ちらつかせます
         opacity *= Math.random();
@@ -61286,7 +61429,7 @@ ParticleEmitter.COLOR_LIST = [0xffff00, 0xffffdd, 0xffffff];
 ParticleEmitter.RADIUS = 50;
 exports.default = ParticleEmitter;
 
-},{"lodash":1,"three":2}],8:[function(require,module,exports){
+},{"lodash":1,"three":2}],11:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61364,7 +61507,7 @@ var Truck = function (_THREE$Object3D) {
 
 exports.default = Truck;
 
-},{"three":2}],9:[function(require,module,exports){
+},{"three":2}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61389,6 +61532,10 @@ var _ParticleEmitter = require('../object/ParticleEmitter');
 
 var _ParticleEmitter2 = _interopRequireDefault(_ParticleEmitter);
 
+var _Cube = require('../object/Cube');
+
+var _Cube2 = _interopRequireDefault(_Cube);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
@@ -61399,16 +61546,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-/**
- * ステップ１シーンクラスです。
- */
 var StepOneScene = function (_THREE$Scene) {
   _inherits(StepOneScene, _THREE$Scene);
-
-  /**
-   * コンストラクター
-   * @constructor
-   */
 
   /** 懐中電灯 */
   function StepOneScene() {
@@ -61418,9 +61557,7 @@ var StepOneScene = function (_THREE$Scene) {
     var _this = _possibleConstructorReturn(this, (StepOneScene.__proto__ || Object.getPrototypeOf(StepOneScene)).call(this));
 
     _this._camera = _Camera2.default.instance;
-    _this._camera.position.x = 10;
-    _this._camera.position.y = 50;
-    _this._camera.position.z = 10;
+    _this._camera.position.set(100, 50, 10);
 
     // 環境光源
     var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -61435,11 +61572,6 @@ var StepOneScene = function (_THREE$Scene) {
     _this.add(_this._particleEmitter);
     return _this;
   }
-
-  /**
-   * 更新します。
-   */
-
   /** パーティクルエミッター */
 
 
@@ -61448,12 +61580,12 @@ var StepOneScene = function (_THREE$Scene) {
 
   _createClass(StepOneScene, [{
     key: 'update',
-    value: function update() {
+    value: function update(time, delta) {
       // カメラを更新
       this._camera.update();
 
       // ライトを更新
-      this._flashLight.update();
+      this._flashLight.update(time, delta);
 
       // パーティクルを更新
       this._particleEmitter.update(this._flashLight.frontVector, this._flashLight.aperture);
@@ -61465,7 +61597,7 @@ var StepOneScene = function (_THREE$Scene) {
 
 exports.default = StepOneScene;
 
-},{"../camera/Camera":4,"../object/FlashLight":6,"../object/ParticleEmitter":7,"three":2}],10:[function(require,module,exports){
+},{"../camera/Camera":4,"../object/Cube":8,"../object/FlashLight":9,"../object/ParticleEmitter":10,"three":2}],13:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61594,5 +61726,5 @@ var StepTwoScene = function (_THREE$Scene) {
 
 exports.default = StepTwoScene;
 
-},{"../camera/Camera":4,"../object/Course":5,"../object/Truck":8,"three":2}]},{},[3])(3)
+},{"../camera/Camera":4,"../object/Course":7,"../object/Truck":11,"three":2}]},{},[3])(3)
 });

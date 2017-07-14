@@ -2,32 +2,26 @@ import * as THREE from 'three';
 import StepOneScene from './scene/StepOneScene';
 import StepTwoScene from './scene/StepTwoScene';
 import Camera from './camera/Camera';
+import TimeAccumulator from './lib/TimeAccumulator';
+import TimeSkipper from './lib/TimeSkipper';
 
-/**
- * メインアプリクラスです。
- */
 module.exports = class App {
 
-  /**
-   * コンストラクター
-   * @constructor
-   */
+  static FPS = 60;
+
   constructor(step) {
 
     this._update = this._update.bind(this);
+    this._render = this._render.bind(this);
+    this._tick = this._tick.bind(this);
     this._resize = this._resize.bind(this);
 
-    // DOM
     this._wrapper = document.getElementById('app');
 
     // シーン
     switch(step) {
-      case 1:
-        this._scene = new StepOneScene();
-        break;
-      case 2:
-        this._scene = new StepTwoScene();
-        break;
+      case 1: this._scene = new StepOneScene(); break;
+      case 2: this._scene = new StepTwoScene(); break;
     };
 
     // カメラ
@@ -43,24 +37,25 @@ module.exports = class App {
     this._resize();
     window.addEventListener('resize', this._resize);
 
-    // フレーム毎の更新
-    this._update();
+    // 更新と描画
+    this.timeAccumulator = new TimeAccumulator(this._update,App.FPS);
+    this.timeSkipper = new TimeSkipper(this._render,App.FPS);
+    this._tick();
   }
 
-  /**
-   * フレーム毎の更新です。
-   */
-  _update() {
-    requestAnimationFrame(this._update);
-    // シーンの更新
-    this._scene.update();
-    // 描画
+  _update(time,delta) {
+    this._scene.update(time,delta);
+  };
+  _render(time,delta) {
     this._renderer.render(this._scene, this._camera);
+  };
+  _tick(time) {
+    const currentTime = time / 1000; // sec
+    this.timeAccumulator.exec(currentTime);
+    this.timeSkipper.exec(currentTime);
+    requestAnimationFrame(this._tick);
   }
 
-  /**
-   * リサイズをかけます。
-   */
   _resize() {
     let width = this._wrapper.clientWidth;
     let height = this._wrapper.clientHeight;

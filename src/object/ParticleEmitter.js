@@ -1,9 +1,6 @@
 import * as THREE from 'three';
 import {_} from 'lodash';
 
-/**
- * パーティクルエミッタークラスです。
- */
 export default class ParticleEmitter extends THREE.Object3D {
 
   /** パーティクルの数 */
@@ -22,10 +19,6 @@ export default class ParticleEmitter extends THREE.Object3D {
   /** テクスチャー */
   _texture = null;
 
-  /**
-   * コンストラクター
-   * @constructor
-   */
   constructor() {
     super();
 
@@ -42,9 +35,6 @@ export default class ParticleEmitter extends THREE.Object3D {
     }
   }
 
-  /**
-   * 粒を生成します。
-   */
   _createParticle() {
     // ランダムに色を設定
     let rand = Math.floor(Math.random() * 3);
@@ -76,15 +66,16 @@ export default class ParticleEmitter extends THREE.Object3D {
     return sprite;
   }
 
-  /**
-   * フレーム毎の更新です。
-   */
   update(lightFrontVector, aperture) {
     let target = lightFrontVector.clone();
     // 全てのパーティクルに対して照らされているか判定
     _.each(this._particleStore, (particle) => {
       // 絞り値から透明度の割合を算出
+      // 「懐中電灯の正面ベクトル」と「パーティクルの位置ベクトル」の方向が
+      // 近ければ近いほどパーティクルの不透明度が1に近づいていく
       let dot = particle.position.clone().normalize().dot(target);
+      // 内積は計算結果がベクトルではなく数値になる
+      // 表示される範囲が広すぎるため少し狭める 0.8 ~ 1.0
       let opacity = (dot - (1 - aperture)) / aperture;
       // ちらつかせます
       opacity *= Math.random();
