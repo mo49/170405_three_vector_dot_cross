@@ -16,10 +16,24 @@
       width: 100%;
       height: 100%;
     }
+    .scenes{
+      position: fixed;
+      top: 0; right: 0;
+      color: #333;
+    }
+    .scenes span{
+      background-color: #eee;
+      padding: 10px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <div id="app"></div>
+  <div class="scenes">
+    <span class="js-change-scene" data-scene="1">SCENE1</span>
+    <span class="js-change-scene" data-scene="2">SCENE2</span>
+  </div>
   <script>
     document.addEventListener('DOMContentLoaded',() => {
       var app = new App();

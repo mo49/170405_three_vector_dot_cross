@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import * as THREE from 'three';
 import SampleScene from './scene/SampleScene';
 import StepOneScene from './scene/StepOneScene';
@@ -13,19 +14,22 @@ module.exports = class App {
 
   constructor(step) {
 
+    const that = this;
+
     this._update = this._update.bind(this);
     this._render = this._render.bind(this);
     this._tick = this._tick.bind(this);
     this._resize = this._resize.bind(this);
+    this._change = this._change.bind(this);
 
     this._wrapper = document.getElementById('app');
 
     // シーン
-    switch(step) {
-      case 1: this._scene = new StepOneScene(); break;
-      case 2: this._scene = new StepTwoScene(); break;
-      default: this._scene = new SampleScene();
-    };
+    this._change(step);
+    $('.js-change-scene').on('click', function() {
+      const sceneId = parseInt(this.getAttribute('data-scene'));
+      that._change(sceneId);
+    })
 
     // カメラ
     this._camera = Camera.instance;
@@ -57,6 +61,14 @@ module.exports = class App {
     this.timeAccumulator.exec(currentTime);
     this.timeSkipper.exec(currentTime);
     requestAnimationFrame(this._tick);
+  }
+
+  _change(step) {
+    switch(step) {
+      case 1: this._scene = new StepOneScene(); break;
+      case 2: this._scene = new StepTwoScene(); break;
+      default: this._scene = new SampleScene();
+    };
   }
 
   _resize() {
