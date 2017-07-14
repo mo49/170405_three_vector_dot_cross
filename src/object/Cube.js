@@ -13,9 +13,9 @@ export default class Cube extends THREE.Object3D {
       new THREE.MeshLambertMaterial({ color: 0xFBBC05 })
     );
     cube.position.set(
-      Math.random()*30,
-      Math.random()*30,
-      Math.random()*30,
+      Math.random()*20,
+      Math.random()*20,
+      Math.random()*20,
     )
     this.add(cube);
   }
@@ -26,6 +26,6 @@ export default class Cube extends THREE.Object3D {
     let radian = this._angle * Math.PI / 180;
 
     this.rotation.x = radian * 0.5;
-    // this.rotation.z = radian;
+    this.rotation.z = radian;
   }
 }

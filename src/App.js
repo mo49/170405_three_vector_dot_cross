@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import SampleScene from './scene/SampleScene';
 import StepOneScene from './scene/StepOneScene';
 import StepTwoScene from './scene/StepTwoScene';
 import Camera from './camera/Camera';
@@ -23,6 +24,7 @@ module.exports = class App {
     switch(step) {
       case 1: this._scene = new StepOneScene(); break;
       case 2: this._scene = new StepTwoScene(); break;
+      default: this._scene = new SampleScene();
     };
 
     // カメラ

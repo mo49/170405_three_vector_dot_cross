@@ -15,9 +15,10 @@ export default class SampleScene extends THREE.Scene {
     this._camera.position.set(100,50,10);
 
     // 環境光源
-    // let ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    let ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    this.add(ambientLight);
     let directionaLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    // directionaLight.position.set(0,100,30);
+    directionaLight.position.set(0,30,10);
     this.add(directionaLight);
 
     // 箱
@@ -25,12 +26,12 @@ export default class SampleScene extends THREE.Scene {
     this.add(this._cube);
 
     // helper
-    let gridHelper = new THREE.GridHelper(100,2); // size, step
+    let gridHelper = new THREE.GridHelper(100,50); // size, step
     this.add(gridHelper);
-    // let axisHelper = new THREE.AxisHelper(200,50);
-    // this.add(axisHelper);
-    // let lightHelper = new THREE.DirectionalLightHelper(this.light,20);
-    // this.add(lightHelper);
+    let axisHelper = new THREE.AxisHelper(200,50);
+    this.add(axisHelper);
+    let lightHelper = new THREE.DirectionalLightHelper(directionaLight,10);
+    this.add(lightHelper);
 
   }
 

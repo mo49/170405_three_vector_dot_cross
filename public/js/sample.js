@@ -60783,6 +60783,10 @@ var _three = require('three');
 
 var THREE = _interopRequireWildcard(_three);
 
+var _SampleScene = require('./scene/SampleScene');
+
+var _SampleScene2 = _interopRequireDefault(_SampleScene);
+
 var _StepOneScene = require('./scene/StepOneScene');
 
 var _StepOneScene2 = _interopRequireDefault(_StepOneScene);
@@ -60826,6 +60830,8 @@ module.exports = (_temp = _class = function () {
         this._scene = new _StepOneScene2.default();break;
       case 2:
         this._scene = new _StepTwoScene2.default();break;
+      default:
+        this._scene = new _SampleScene2.default();
     };
 
     // カメラ
@@ -60882,7 +60888,7 @@ module.exports = (_temp = _class = function () {
   return App;
 }(), _class.FPS = 60, _class.DPR = window.devicePixelRatio || 1, _temp);
 
-},{"./camera/Camera":4,"./lib/TimeAccumulator":5,"./lib/TimeSkipper":6,"./scene/StepOneScene":12,"./scene/StepTwoScene":13,"three":2}],4:[function(require,module,exports){
+},{"./camera/Camera":4,"./lib/TimeAccumulator":5,"./lib/TimeSkipper":6,"./scene/SampleScene":12,"./scene/StepOneScene":13,"./scene/StepTwoScene":14,"three":2}],4:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
@@ -61158,7 +61164,7 @@ var Cube = function (_THREE$Object3D) {
 
 
     var cube = new THREE.Mesh(new THREE.CubeGeometry(10, 10, 10), new THREE.MeshLambertMaterial({ color: 0xFBBC05 }));
-    cube.position.set(Math.random() * 30, Math.random() * 30, Math.random() * 30);
+    cube.position.set(Math.random() * 20, Math.random() * 20, Math.random() * 20);
     _this.add(cube);
     return _this;
   }
@@ -61171,7 +61177,7 @@ var Cube = function (_THREE$Object3D) {
       var radian = this._angle * Math.PI / 180;
 
       this.rotation.x = radian * 0.5;
-      // this.rotation.z = radian;
+      this.rotation.z = radian;
     }
   }]);
 
@@ -61506,6 +61512,86 @@ var _Camera = require('../camera/Camera');
 
 var _Camera2 = _interopRequireDefault(_Camera);
 
+var _Cube = require('../object/Cube');
+
+var _Cube2 = _interopRequireDefault(_Cube);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var SampleScene = function (_THREE$Scene) {
+  _inherits(SampleScene, _THREE$Scene);
+
+  function SampleScene() {
+    var opts = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, SampleScene);
+
+    // カメラ
+    var _this = _possibleConstructorReturn(this, (SampleScene.__proto__ || Object.getPrototypeOf(SampleScene)).call(this));
+
+    _this._camera = _Camera2.default.instance;
+    _this._camera.position.set(100, 50, 10);
+
+    // 環境光源
+    var ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    _this.add(ambientLight);
+    var directionaLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionaLight.position.set(0, 30, 10);
+    _this.add(directionaLight);
+
+    // 箱
+    _this._cube = new _Cube2.default();
+    _this.add(_this._cube);
+
+    // helper
+    var gridHelper = new THREE.GridHelper(100, 50); // size, step
+    _this.add(gridHelper);
+    var axisHelper = new THREE.AxisHelper(200, 50);
+    _this.add(axisHelper);
+    var lightHelper = new THREE.DirectionalLightHelper(directionaLight, 10);
+    _this.add(lightHelper);
+
+    return _this;
+  }
+
+  _createClass(SampleScene, [{
+    key: 'update',
+    value: function update(time, delta) {
+      this._camera.update();
+      this._cube.update(time, delta);
+    }
+  }]);
+
+  return SampleScene;
+}(THREE.Scene);
+
+exports.default = SampleScene;
+
+},{"../camera/Camera":4,"../object/Cube":8,"three":2}],13:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _three = require('three');
+
+var THREE = _interopRequireWildcard(_three);
+
+var _Camera = require('../camera/Camera');
+
+var _Camera2 = _interopRequireDefault(_Camera);
+
 var _FlashLight = require('../object/FlashLight');
 
 var _FlashLight2 = _interopRequireDefault(_FlashLight);
@@ -61579,7 +61665,7 @@ var StepOneScene = function (_THREE$Scene) {
 
 exports.default = StepOneScene;
 
-},{"../camera/Camera":4,"../object/Cube":8,"../object/FlashLight":9,"../object/ParticleEmitter":10,"three":2}],13:[function(require,module,exports){
+},{"../camera/Camera":4,"../object/Cube":8,"../object/FlashLight":9,"../object/ParticleEmitter":10,"three":2}],14:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, "__esModule", {
